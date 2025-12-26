@@ -499,6 +499,7 @@ function sendMessage() {
     try {
         addChatMessage(userMessage, 'user');
         chatInput.value = '';
+        autoResizeTextarea(chatInput); // Reset textarea size after clearing
 
         const templateApplication = applyTemplatesToMessage(userMessage);
         const effectiveMessage = templateApplication.effectiveMessage;
@@ -1718,8 +1719,16 @@ async function generateSingleImage(apiKey, requestId, prompt, index, total, sour
 }
 
 // ============================================================================
+// Auto-resize textarea functionality
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+}
+
+// ============================================================================
 // Keyboard shortcuts
-document.getElementById('chatInput').addEventListener('keydown', (e) => {
+const chatInput = document.getElementById('chatInput');
+chatInput.addEventListener('keydown', (e) => {
     // Don't interfere with autocomplete navigation
     if (isAutocompleteOpen() && ['ArrowUp', 'ArrowDown', 'Enter', 'Tab', 'Escape'].includes(e.key)) {
         return; // Let autocomplete handle it
@@ -1729,6 +1738,11 @@ document.getElementById('chatInput').addEventListener('keydown', (e) => {
         e.preventDefault();
         sendMessage();
     }
+});
+
+// Auto-resize on input
+chatInput.addEventListener('input', () => {
+    autoResizeTextarea(chatInput);
 });
 
 // API Key persistence
