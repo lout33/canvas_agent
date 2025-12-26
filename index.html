@@ -97,26 +97,36 @@
                             title="Edit project title (used in export filenames)"
                         />
                     </div>
-                    <button
-                        type="button"
-                        class="guide-button desktop-only"
-                        id="openOnboardingBtn"
-                        aria-haspopup="dialog"
-                        aria-controls="onboardingModal"
-                    >
-                        Guide
-                    </button>
-                    <button
-                        type="button"
-                        class="discord-button desktop-only"
-                        id="discordContactBtn"
-                        aria-label="Join our Discord community for support"
-                        title="Join our Discord community for support"
-                        onclick="window.open('https://discord.gg/A9twhJjCyf', '_blank', 'noopener,noreferrer')"
-                    >
-                        <img src="public/discord.png" alt="Discord" class="discord-logo">
-                        <span>Discord</span>
-                    </button>
+                    <div class="header-right-buttons">
+                        <button
+                            type="button"
+                            class="guide-button desktop-only"
+                            id="openOnboardingBtn"
+                            aria-haspopup="dialog"
+                            aria-controls="onboardingModal"
+                        >
+                            Guide
+                        </button>
+                        <button
+                            type="button"
+                            class="guide-button desktop-only"
+                            id="openWorkflowModalBtn"
+                            title="Workflows"
+                        >
+                            Workflows
+                        </button>
+                        <button
+                            type="button"
+                            class="discord-button desktop-only"
+                            id="discordContactBtn"
+                            aria-label="Join our Discord community for support"
+                            title="Join our Discord community for support"
+                            onclick="window.open('https://discord.gg/A9twhJjCyf', '_blank', 'noopener,noreferrer')"
+                        >
+                            <img src="public/discord.png" alt="Discord" class="discord-logo">
+                            <span>Discord</span>
+                        </button>
+                    </div>
                     <button
                         type="button"
                         class="mobile-menu-toggle"
@@ -144,10 +154,6 @@
                     <button id="openTemplateModalBtn" type="button" title="Templates">
                         <span class="action-icon">🧩</span>
                         <span class="action-label">Template</span>
-                    </button>
-                    <button id="openWorkflowModalBtn" type="button" title="Workflows">
-                        <span class="action-icon">🔄</span>
-                        <span class="action-label">Workflow</span>
                     </button>
                     <span class="action-divider"></span>
                     <button onclick="resetCanvas()" title="Reset View">

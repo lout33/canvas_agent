@@ -341,6 +341,55 @@ const WORKFLOW_TEMPLATES = [
         description: 'Explore a single moment from multiple angles using a cinematic contact sheet.',
         thumbnail: '/workflows/workflow2/preview.png',
         jsonPath: '/workflows/workflow2/workflow.json'
+    },
+    {
+        id: 'warm-wave-workflow',
+        title: '🌊 Warm Wave',
+        description: 'Creative workflow with warm, flowing visual elements and dynamic compositions.',
+        thumbnail: '/workflows/workflow3/image.png',
+        jsonPath: '/workflows/workflow3/warm-wave-canvas-2025-12-26.json'
+    },
+    {
+        id: 'vibrant-sunset-workflow',
+        title: '🌅 Vibrant Sunset',
+        description: 'Explore vibrant color palettes and sunset-inspired visual storytelling.',
+        thumbnail: '/workflows/workflow4/image.png',
+        jsonPath: '/workflows/workflow4/vibrant-sunset-canvas-2025-12-26.json'
+    },
+    {
+        id: 'pastel-ocean-workflow',
+        title: '🌊 Pastel Ocean',
+        description: 'Soft, dreamy ocean-themed workflow with pastel color schemes and fluid designs.',
+        thumbnail: '/workflows/workflow5/image.png',
+        jsonPath: '/workflows/workflow5/pastel-ocean-canvas-2025-12-26.json'
+    },
+    {
+        id: 'desert-sunrise-workflow',
+        title: '🏜️ Desert Sunrise',
+        description: 'Warm desert landscapes with golden sunrise lighting and natural earth tones.',
+        thumbnail: '/workflows/workflow6/image.png',
+        jsonPath: '/workflows/workflow6/desert-sunrise-canvas-2025-12-26.json'
+    },
+    {
+        id: 'desert-sunrise-extended',
+        title: '🌄 Desert Sunrise Extended',
+        description: 'Extended desert sunrise workflow with advanced lighting and atmospheric effects.',
+        thumbnail: '/workflows/workflow7/image.png',
+        jsonPath: '/workflows/workflow7/desert-sunrise-canvas-2025-12-26 (1).json'
+    },
+    {
+        id: 'digital-wave-workflow',
+        title: '💫 Digital Wave',
+        description: 'Modern digital art workflow with wave patterns and futuristic aesthetics.',
+        thumbnail: '/workflows/workflow8/image.png',
+        jsonPath: '/workflows/workflow8/digital-wave-canvas-2025-12-26.json'
+    },
+    {
+        id: 'desert-sunrise-pro',
+        title: '🏜️ Desert Sunrise Pro',
+        description: 'Professional desert sunrise workflow with advanced composition and color grading.',
+        thumbnail: '/workflows/workflow9/image.png',
+        jsonPath: '/workflows/workflow9/desert-sunrise-canvas-2025-12-26 (2).json'
     }
 ];
 

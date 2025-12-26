@@ -1786,6 +1786,36 @@ async function handleDirectImageGeneration(userMessage, apiKey) {
     try {
         updateRequestStatus(requestId, 'running', 'Processing direct image generation...');
         
+        // Extract image references with modifiers (e.g., @i224:style)
+        const imageReferencesWithModifiers = extractImageReferencesWithModifiers(userMessage);
+        const legacyImageIds = extractPrefixedIds(userMessage, LEGACY_IMAGE_REFERENCE_REGEX);
+        
+        // Combine all unique image IDs
+        const allImageIds = Array.from(new Set([
+            ...imageReferencesWithModifiers.map(ref => ref.id),
+            ...legacyImageIds
+        ]));
+        
+        let referencedImages = [];
+        if (allImageIds.length > 0) {
+            referencedImages = canvasState.images.filter(img => allImageIds.includes(img.id));
+            
+            // Apply modifiers to images
+            referencedImages = referencedImages.map(img => {
+                const refWithModifier = imageReferencesWithModifiers.find(ref => ref.id === img.id);
+                return refWithModifier ? { ...img, referenceModifier: refWithModifier.modifier } : img;
+            });
+            
+            if (referencedImages.length > 0) {
+                addRequestLog(requestId, '🖼️', `Including ${referencedImages.length} image(s): ${referencedImages.map(img => formatImageRef(img.id)).join(', ')}`);
+            }
+            
+            const missingImages = allImageIds.filter(id => !referencedImages.some(img => img.id === id));
+            if (missingImages.length > 0) {
+                addRequestLog(requestId, '⚠️', `Image(s) not found: ${missingImages.map(id => formatImageRef(id)).join(', ')}`);
+            }
+        }
+        
         // Extract note references from the message
         const noteIdsInMessage = extractPrefixedIds(userMessage, NOTE_REFERENCE_REGEX);
         let enhancedPrompt = userMessage;
@@ -1811,15 +1841,20 @@ async function handleDirectImageGeneration(userMessage, apiKey) {
         
         const placeholder = addImagePlaceholder(requestId, enhancedPrompt, selectedAspectRatio);
         
+        // Prepare source images for generation
+        const sourceImages = referencedImages.length > 0 
+            ? referencedImages.map(img => ({ data: img.data, mimeType: img.mimeType }))
+            : null;
+        
         const generatedImage = await generateSingleImage(
             apiKey,
             requestId,
             enhancedPrompt,
             1,
             1,
-            null,
+            sourceImages,
             selectedAspectRatio,
-            [],
+            referencedImages.map(img => img.id),
             placeholder
         );
         
