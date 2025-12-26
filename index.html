@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Agent – AI Image Workspace</title>
+    <meta
+        name="description"
+        content="Canvas Agent is a collaborative AI workspace for generating, editing, and organizing Gemini-powered visuals."
+    >
+    <meta
+        name="keywords"
+        content="AI image generator, Gemini image editor, creative workspace, video generation, canvas collaboration"
+    >
+    <meta name="author" content="Canvas Agent">
+    <link rel="canonical" href="https://canvas-agent.vercel.app/">
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#fdd835">
+    <meta name="theme-color" content="#0a1228">
+    <meta name="color-scheme" content="dark light">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="msapplication-TileColor" content="#0a1228">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://canvas-agent.vercel.app/">
+    <meta property="og:title" content="Canvas Agent – AI Image Workspace">
+    <meta
+        property="og:description"
+        content="Design, iterate, and manage Gemini-powered visuals with a shared infinite canvas."
+    >
+    <meta property="og:image" content="https://canvas-agent.vercel.app/social-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Canvas Agent – AI Image Workspace">
+    <meta
+        name="twitter:description"
+        content="Design, iterate, and manage Gemini-powered visuals with a shared infinite canvas."
+    >
+    <meta name="twitter:image" content="https://canvas-agent.vercel.app/social-preview.png">
+    <meta name="twitter:creator" content="@CanvasAgentAI">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Canvas Agent",
+            "description": "Collaborative AI workspace for generating, editing, and organizing Gemini-powered images and videos.",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "url": "https://canvas-agent.vercel.app/",
+            "publisher": {
+                "@type": "Organization",
+                "name": "Canvas Agent"
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "tpeouy7trz");
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Canvas Panel - Left -->
+        <div class="canvas-panel">
+            <div class="canvas-header">
+                <div class="canvas-header-bar">
+                    <div class="canvas-title" aria-label="Canvas Agent workspace canvas">
+                        <span class="canvas-title-icon" aria-hidden="true">🎨</span>
+                        <div class="canvas-title-meta">
+                            <h1>Canvas Agent</h1>
+                            <p class="desktop-only">Workspace canvas</p>
+                        </div>
+                    </div>
+                    <div class="project-title-container desktop-only">
+                        <label for="projectTitleInput" class="project-title-label">Project:</label>
+                        <input
+                            type="text"
+                            id="projectTitleInput"
+                            class="project-title-input"
+                            placeholder="cosmic-falcon"
+                            maxlength="50"
+                            title="Edit project title (used in export filenames)"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        class="guide-button desktop-only"
+                        id="openOnboardingBtn"
+                        aria-haspopup="dialog"
+                        aria-controls="onboardingModal"
+                    >
+                        Guide
+                    </button>
+                    <button
+                        type="button"
+                        class="discord-button desktop-only"
+                        id="discordContactBtn"
+                        aria-label="Join our Discord community for support"
+                        title="Join our Discord community for support"
+                        onclick="window.open('https://discord.gg/zUXMBdzV', '_blank', 'noopener,noreferrer')"
+                    >
+                        <img src="public/discord.png" alt="Discord" class="discord-logo">
+                        <span>Discord</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="mobile-menu-toggle"
+                        id="mobileMenuToggle"
+                        aria-label="Open tools menu"
+                        title="Open tools menu"
+                    >
+                        <span class="menu-icon">☰</span>
+                    </button>
+                </div>
+                <!-- Header Actions Row (below header bar) -->
+                <div class="canvas-header-actions desktop-only">
+                    <button onclick="createNewSessionBtn()" title="New Session">
+                        <span class="action-icon">🆕</span>
+                        <span class="action-label">New</span>
+                    </button>
+                    <button onclick="showSessionInfo()" title="Session Info">
+                        <span class="action-icon">📋</span>
+                        <span class="action-label">Session</span>
+                    </button>
+                    <button onclick="createTextNoteButton()" title="Create Note">
+                        <span class="action-icon">📝</span>
+                        <span class="action-label">Note</span>
+                    </button>
+                    <button id="openTemplateModalBtn" type="button" title="Templates">
+                        <span class="action-icon">🧩</span>
+                        <span class="action-label">Template</span>
+                    </button>
+                    <button id="openWorkflowModalBtn" type="button" title="Workflows">
+                        <span class="action-icon">🔄</span>
+                        <span class="action-label">Workflow</span>
+                    </button>
+                    <span class="action-divider"></span>
+                    <button onclick="resetCanvas()" title="Reset View">
+                        <span class="action-icon">🔃</span>
+                        <span class="action-label">Reset</span>
+                    </button>
+                    <button onclick="clearCanvas()" title="Clear All">
+                        <span class="action-icon">🧹</span>
+                        <span class="action-label">Clear</span>
+                    </button>
+                    <button onclick="exportCanvas()" title="Export JSON">
+                        <span class="action-icon">💾</span>
+                        <span class="action-label">Export</span>
+                    </button>
+                    <button onclick="openImportJsonDialog()" title="Import JSON">
+                        <span class="action-icon">📂</span>
+                        <span class="action-label">Import</span>
+                    </button>
+                    <button onclick="exportAllAssets()" title="Export Assets">
+                        <span class="action-icon">📦</span>
+                        <span class="action-label">Assets</span>
+                    </button>
+                </div>
+                <div class="canvas-ids">
+                    <div class="canvas-ids-group">
+                        <details class="canvas-ids-accordion" id="canvasImagesAccordion">
+                            <summary>
+                                <span class="canvas-ids-label">Images (@i)</span>
+                                <span class="canvas-ids-count" id="canvasImageCount">0</span>
+                            </summary>
+                            <div class="canvas-ids-list" id="canvasImageIdsList">
+                                <span class="canvas-ids-empty">No images yet</span>
+                            </div>
+                        </details>
+                    </div>
+                    <div class="canvas-ids-group">
+                        <details class="canvas-ids-accordion" id="canvasVideosAccordion">
+                            <summary>
+                                <span class="canvas-ids-label">Videos (@v)</span>
+                                <span class="canvas-ids-count" id="canvasVideoCount">0</span>
+                            </summary>
+                            <div class="canvas-ids-list" id="canvasVideoIdsList">
+                                <span class="canvas-ids-empty">No videos yet</span>
+                            </div>
+                        </details>
+                    </div>
+                    <div class="canvas-ids-group">
+                        <details class="canvas-ids-accordion" id="canvasAudiosAccordion">
+                            <summary>
+                                <span class="canvas-ids-label">Audio (@a)</span>
+                                <span class="canvas-ids-count" id="canvasAudioCount">0</span>
+                            </summary>
+                            <div class="canvas-ids-list" id="canvasAudioIdsList">
+                                <span class="canvas-ids-empty">No audio yet</span>
+                            </div>
+                        </details>
+                    </div>
+                    <div class="canvas-ids-group">
+                        <details class="canvas-ids-accordion" id="canvasNotesAccordion">
+                            <summary>
+                                <span class="canvas-ids-label">Notes (@t)</span>
+                                <span class="canvas-ids-count" id="canvasNoteCount">0</span>
+                            </summary>
+                            <div class="canvas-ids-list" id="canvasNoteIdsList">
+                                <span class="canvas-ids-empty">No notes yet</span>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+            <div class="canvas-area" id="canvasArea">
+                <div id="canvas"></div>
+                <!-- Left Side Tool Panel -->
+                <div class="canvas-tool-panel">
+                    <div class="tool-group">
+                        <button id="undoBtn" onclick="undoAction()" title="Undo (Ctrl+Z)" disabled>
+                            <span class="tool-icon">↩️</span>
+                        </button>
+                        <button id="redoBtn" onclick="redoAction()" title="Redo (Ctrl+Shift+Z)" disabled>
+                            <span class="tool-icon">↪️</span>
+                        </button>
+                    </div>
+                    <div class="tool-divider"></div>
+                    <div class="tool-group">
+                        <button id="deleteBtn" onclick="deleteSelectedImages()" title="Delete (Del)" disabled>
+                            <span class="tool-icon">🗑️</span>
+                        </button>
+                    </div>
+                    <div class="tool-divider"></div>
+                    <div class="tool-group">
+                        <button id="panModeBtn" onclick="togglePanMode()" title="Pan Mode (Space/H)">
+                            <span class="tool-icon">✋</span>
+                        </button>
+                        <button onclick="zoomIn()" title="Zoom In (+)">
+                            <span class="tool-icon">🔍</span>
+                        </button>
+                        <button onclick="zoomOut()" title="Zoom Out (-)">
+                            <span class="tool-icon">🔎</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="canvas-stats" id="canvasStats">
+                    Images: 0 | Zoom: 100% | Position: (0, 0)
+                </div>
+                <div class="save-indicator" id="saveIndicator">💾 Auto-save</div>
+            </div>
+        </div>
+
+        <!-- Chat Panel - Right -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <div>
+                    <h2>Agent</h2>
+                </div>
+                <div class="chat-header-actions">
+                    <button
+                        type="button"
+                        class="settings-button"
+                        id="openSettingsBtn"
+                        aria-haspopup="dialog"
+                        aria-controls="settingsModal"
+                        title="Open API & model settings"
+                        aria-label="Open API and model settings"
+                    >
+                        ⚙️
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message assistant">
+                    👋 Welcome to Canvas Agent!<br><br>
+                    <strong>Generate:</strong> "create 5 cat images"<br>
+                    <strong>Edit:</strong> Paste an image onto the canvas, then say "make @i3 pink"<br>
+                    <strong>Reference:</strong> Use @i/@v/@t to reference images, videos, and notes (e.g., "make @i3 pink" or "animate @i5 into a video")<br>
+                    <strong>Notes:</strong> Click "📝 Create Text Node" button or say "create a note"<br>
+                      <strong>Canvas:</strong> Images automatically appear on canvas with IDs!
+                </div>
+            </div>
+
+            <div class="chat-input-section">
+                <div class="error" id="errorMessage"></div>
+                <div class="action-buttons">
+                    <button onclick="clearChat()">Clear Chat</button>
+                    <!-- <button onclick="clearCanvas()">Clear Canvas</button> -->
+                </div>
+                <div class="model-selectors">
+                    <div class="model-selector-group">
+                        <label for="chatAgentModel" class="model-selector-label">Agent:</label>
+                        <select id="chatAgentModel" class="chat-model-select" aria-label="Select text agent model">
+                            <!-- Options populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="model-selector-group">
+                        <label for="chatImageModel" class="model-selector-label">Image:</label>
+                        <select id="chatImageModel" class="chat-model-select" aria-label="Select image generation model">
+                            <!-- Options populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="chat-input-wrapper">
+                    <div id="autocompleteDropdown" class="autocomplete-dropdown" hidden>
+                        <div class="autocomplete-header"></div>
+                        <div class="autocomplete-items"></div>
+                        <div class="autocomplete-footer">↑↓ navigate • ↵ select • esc close</div>
+                    </div>
+                    <textarea
+                        id="chatInput"
+                        placeholder="Type your command... (e.g., 'generate 3 sunset images')"
+                    ></textarea>
+                </div>
+                <button id="sendBtn" onclick="sendMessage()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <input
+        type="file"
+        id="importJsonInput"
+        class="hidden"
+        accept="application/json,.json"
+        aria-hidden="true"
+    />
+
+    <div
+        class="onboarding-modal hidden"
+        id="onboardingModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="onboardingTitle"
+        tabindex="-1"
+    >
+        <div class="onboarding-backdrop" id="onboardingBackdrop"></div>
+        <div class="onboarding-content onboarding-full" role="document">
+            <button type="button" class="onboarding-close" id="closeOnboardingBtn" aria-label="Close welcome">×</button>
+
+            <h2 id="onboardingTitle">Welcome to Canvas Agent</h2>
+
+            <!-- Demo video -->
+            <div class="onboarding-demo">
+                <iframe
+                    src="https://www.youtube.com/embed/WE4jjTTnQ2g?autoplay=1&mute=1&loop=1"
+                    title="Canvas Agent Demo"
+                    frameborder="0"
+                    allowfullscreen
+                ></iframe>
+            </div>
+
+            <h3 class="onboarding-steps-title">Get started in 3 steps:</h3>
+
+            <ol class="onboarding-steps-simple">
+                <li>
+                    <span class="step-number">1</span>
+                    <span class="step-text">Add your Gemini API key</span>
+                    <button type="button" class="step-action-btn" id="onboardingOpenSettings">Open Settings</button>
+                </li>
+                <li>
+                    <span class="step-number">2</span>
+                    <span class="step-text">Paste or drop an image onto the canvas</span>
+                </li>
+                <li>
+                    <span class="step-number">3</span>
+                    <span class="step-text">Type what you want: <code>"make @i1 more colorful"</code></span>
+                </li>
+            </ol>
+
+            <!-- Try a Workflow Section -->
+            <div class="onboarding-workflows-section">
+                <h3 class="onboarding-workflows-title">🚀 Try a Workflow</h3>
+                <p class="onboarding-workflows-subtitle">Click to load example images and see how it works:</p>
+                <div class="onboarding-workflow-cards" id="onboardingWorkflowCards">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Capabilities Section -->
+            <div class="onboarding-capabilities">
+                <h3 class="capabilities-title">Full Capabilities</h3>
+
+                <!-- Image Generation -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">🎨</span> Image Generation & Editing</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>generate 5 cat images</code> <span class="example-desc">Create new images from text</span></div>
+                        <div class="example-item"><code>make @i3 pink</code> <span class="example-desc">Edit existing images by ID</span></div>
+                        <div class="example-item"><code>generate in 4K</code> <span class="example-desc">High resolution output (2K, 4K)</span></div>
+                        <div class="example-item"><code>create a 16:9 landscape</code> <span class="example-desc">Custom aspect ratios</span></div>
+                    </div>
+                </div>
+
+                <!-- Reference Modifiers -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">🔗</span> Reference Modifiers</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>@i3:style</code> <span class="example-desc">Use image as style reference only</span></div>
+                        <div class="example-item"><code>@i5:base @i7:style</code> <span class="example-desc">Edit base image with another's style</span></div>
+                        <div class="example-item"><code>@i1:base add @i2 to it</code> <span class="example-desc">Composite images together</span></div>
+                    </div>
+                </div>
+
+                <!-- Video Generation -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">🎬</span> Video Generation (Veo 3)</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>create a sunset video</code> <span class="example-desc">Text-to-video generation</span></div>
+                        <div class="example-item"><code>animate @i1</code> <span class="example-desc">Turn any image into video</span></div>
+                        <div class="example-item"><code>@i1 first frame @i2 last frame</code> <span class="example-desc">Transition between two images</span></div>
+                        <div class="example-item"><code>describe @v1</code> <span class="example-desc">Analyze video content</span></div>
+                    </div>
+                </div>
+
+                <!-- Audio Generation -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">🔊</span> Audio Generation (Fish Audio)</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>generate audio "Hello world"</code> <span class="example-desc">Text-to-speech</span></div>
+                        <div class="example-item"><code>create narration for scene 1</code> <span class="example-desc">Voice narration</span></div>
+                    </div>
+                </div>
+
+                <!-- Story Mode -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">📖</span> Story Mode</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>create a 5 scene story about...</code> <span class="example-desc">Auto-generate full visual stories</span></div>
+                        <div class="example-item"><code>story for youtube short</code> <span class="example-desc">Format-specific stories</span></div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">📝</span> Notes & Organization</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>create a note with tasks...</code> <span class="example-desc">Add text notes to canvas</span></div>
+                        <div class="example-item"><code>@t1</code> <span class="example-desc">Reference notes in prompts</span></div>
+                    </div>
+                </div>
+
+                <!-- Templates & Workflows -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">🧩</span> Templates & Workflows</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>/template_name</code> <span class="example-desc">Use saved prompt templates</span></div>
+                        <div class="example-item"><span class="example-desc">Create custom templates for reusable prompts</span></div>
+                        <div class="example-item"><span class="example-desc">Load workflow presets with example images</span></div>
+                    </div>
+                </div>
+
+                <!-- Autocomplete -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">⚡</span> Smart Autocomplete</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><code>@</code> <span class="example-desc">Quick reference images, videos, audio, notes</span></div>
+                        <div class="example-item"><code>/</code> <span class="example-desc">Browse and insert templates</span></div>
+                        <div class="example-item"><code>:</code> <span class="example-desc">Add modifiers (:style, :base)</span></div>
+                    </div>
+                </div>
+
+                <!-- Canvas Features -->
+                <div class="capability-section">
+                    <h4><span class="capability-icon">🖼️</span> Canvas Features</h4>
+                    <div class="capability-examples">
+                        <div class="example-item"><span class="example-desc">Paste images directly (Ctrl+V)</span></div>
+                        <div class="example-item"><span class="example-desc">Box-select multiple items</span></div>
+                        <div class="example-item"><span class="example-desc">Pan mode (Space or H)</span></div>
+                        <div class="example-item"><span class="example-desc">Export/Import canvas as JSON</span></div>
+                        <div class="example-item"><span class="example-desc">Multiple sessions with unique URLs</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="onboarding-cta" id="onboardingDismiss">Got it, let's go!</button>
+
+            <div class="onboarding-footer-links">
+                <button type="button" id="onboardingTemplates">🧩 Templates</button>
+                <button type="button" onclick="window.open('https://discord.gg/zUXMBdzV', '_blank')">💬 Discord</button>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="template-modal hidden"
+        id="templateModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="templateModalTitle"
+        tabindex="-1"
+    >
+        <div class="template-modal-backdrop" id="templateModalBackdrop"></div>
+        <div class="template-modal-content" role="document">
+            <button type="button" class="template-modal-close" id="closeTemplateModalBtn" aria-label="Close template manager">×</button>
+            <h2 id="templateModalTitle">Create Template</h2>
+            <form id="templateForm" class="template-form">
+                <label for="templateCommandInput">Template command</label>
+                <input
+                    id="templateCommandInput"
+                    name="templateCommand"
+                    type="text"
+                    placeholder="/template_image1"
+                    autocomplete="off"
+                    required
+                >
+                <p class="template-field-hint">Use letters, numbers, hyphens, or underscores. Example: /template_image1</p>
+
+                <label for="templatePromptInput">Template prompt</label>
+                <textarea
+                    id="templatePromptInput"
+                    name="templatePrompt"
+                    rows="6"
+                    placeholder="Enter the detailed instructions that should be appended to your prompt..."
+                    required
+                ></textarea>
+
+                <div class="template-form-actions">
+                    <button type="submit">Save Template</button>
+                </div>
+                <div class="template-form-message" id="templateFormMessage" aria-live="polite"></div>
+            </form>
+
+            <div class="template-list-container">
+                <h3>Saved Templates</h3>
+                <div class="template-list" id="templateList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="template-preview-modal hidden"
+        id="templatePreviewModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="templatePreviewTitle"
+        tabindex="-1"
+    >
+        <div class="template-preview-backdrop" id="templatePreviewBackdrop"></div>
+        <div class="template-preview-content" role="document">
+            <button type="button" class="template-preview-close" id="closeTemplatePreviewBtn" aria-label="Close template preview">×</button>
+            <h2 id="templatePreviewTitle">Template Preview</h2>
+            <div class="template-preview-body">
+                <div class="template-preview-command" id="templatePreviewCommand"></div>
+                <pre class="template-preview-prompt" id="templatePreviewPrompt"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="session-modal hidden"
+        id="sessionModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="sessionModalTitle"
+        tabindex="-1"
+    >
+        <div class="session-modal-backdrop" id="sessionModalBackdrop"></div>
+        <div class="session-modal-content" role="document">
+            <button type="button" class="session-modal-close" id="closeSessionModalBtn" aria-label="Close session info">×</button>
+            <h2 id="sessionModalTitle">Session Information</h2>
+            <div class="session-modal-body">
+                <div class="session-info">
+                    <label for="currentSessionId">Current Session ID:</label>
+                    <input type="text" id="currentSessionId" readonly class="session-id-input">
+                    <button type="button" onclick="copySessionId()" class="copy-session-btn">📋 Copy</button>
+                </div>
+                <div class="session-info">
+                    <label for="sessionUrl">Session URL:</label>
+                    <input type="text" id="sessionUrl" readonly class="session-url-input">
+                    <button type="button" onclick="copySessionUrl()" class="copy-session-btn">📋 Copy</button>
+                </div>
+                <div class="session-actions">
+                    <button type="button" onclick="createNewSessionFromModal()" class="new-session-btn">🆕 Create New Session</button>
+                    <button type="button" onclick="switchToSessionFromModal()" class="switch-session-btn">🔄 Switch to Session</button>
+                </div>
+                <div class="session-help">
+                    <h3>Session Tips:</h3>
+                    <ul>
+                        <li>Each session has its own canvas and conversation history</li>
+                        <li>Sessions are automatically saved and isolated from each other</li>
+                        <li>Share sessions by copying the URL or session ID</li>
+                        <li>Create multiple sessions to organize different projects</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workflows Modal -->
+    <div
+        class="workflow-modal hidden"
+        id="workflowModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="workflowModalTitle"
+        tabindex="-1"
+    >
+        <div class="workflow-modal-backdrop" id="workflowModalBackdrop"></div>
+        <div class="workflow-modal-content" role="document">
+            <button type="button" class="workflow-modal-close" id="closeWorkflowModalBtn" aria-label="Close workflows">×</button>
+            <h2 id="workflowModalTitle">Workflows</h2>
+            <p class="workflow-modal-description">Select a workflow template to load example images and a sample prompt onto your canvas.</p>
+            <div class="workflow-list" id="workflowList"></div>
+        </div>
+    </div>
+
+    <div
+        class="settings-modal hidden"
+        id="settingsModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="settingsModalTitle"
+        tabindex="-1"
+    >
+        <div class="settings-modal-backdrop" id="settingsBackdrop"></div>
+        <div class="settings-modal-content" role="document">
+            <button
+                type="button"
+                class="settings-modal-close"
+                id="closeSettingsBtn"
+                aria-label="Close settings"
+            >
+                ×
+            </button>
+            <h2 id="settingsModalTitle">API &amp; Model Settings</h2>
+
+            <section class="settings-section" aria-labelledby="settingsGeminiHeading">
+                <div class="settings-section-header">
+                    <h3 id="settingsGeminiHeading">Gemini API</h3>
+                    <a
+                        class="api-key-help"
+                        href="https://aistudio.google.com/api-keys"
+                        target="_blank"
+                        rel="noopener"
+                        aria-label="Open instructions to create a Gemini API key"
+                    >
+                        ?
+                    </a>
+                </div>
+                <label class="settings-label" for="apiKey">Gemini API Key</label>
+                <div class="api-key-input-wrapper">
+                    <input
+                        type="password"
+                        id="apiKey"
+                        placeholder="Enter Gemini API Key..."
+                        autocomplete="off"
+                    >
+                    <button
+                        type="button"
+                        class="api-key-toggle"
+                        id="toggleApiKey"
+                        aria-label="Toggle API key visibility"
+                        title="Show/hide API key"
+                    >
+                        👁️
+                    </button>
+                </div>
+                <label class="settings-label" for="agentModel">Text Agent Model</label>
+                <select id="agentModel" class="model-select" aria-label="Select Gemini text model"></select>
+                <p class="api-key-hint">Flash 2.5 is the default for speed; Pro 2.5 adds extra reasoning depth; Gemini 3 Flash and Pro offer the most advanced reasoning capabilities.</p>
+                <label class="settings-label" for="imageModel">Image Generation Model</label>
+                <select id="imageModel" class="model-select" aria-label="Select Gemini image model"></select>
+                <p class="api-key-hint">Gemini 2.5 Flash Image is fast and efficient; Gemini 3 Pro Image Preview offers higher quality, 4K resolution, and advanced features like Google Search grounding.</p>
+                <div class="free-usage-display" id="freeUsageDisplay">
+                    <p class="free-usage-title">Free Trial Usage</p>
+                    <div class="free-usage-bars">
+                        <div class="free-usage-item">
+                            <span class="free-usage-label">Agent</span>
+                            <div class="free-usage-bar-container">
+                                <div class="free-usage-bar" id="agentUsageBar" style="width: 0%"></div>
+                            </div>
+                            <span class="free-usage-count" id="agentUsageCount">0/20</span>
+                        </div>
+                        <div class="free-usage-item">
+                            <span class="free-usage-label">Image</span>
+                            <div class="free-usage-bar-container">
+                                <div class="free-usage-bar" id="imageUsageBar" style="width: 0%"></div>
+                            </div>
+                            <span class="free-usage-count" id="imageUsageCount">0/5</span>
+                        </div>
+                    </div>
+                    <p class="api-key-hint">Free trial: 20 agent + 5 image requests per day. Add your API key for unlimited use.</p>
+                </div>
+                <div class="settings-inline-actions">
+                    <button type="button" class="settings-link-button" id="copyCurlBtn">
+                        Copy curl check command
+                    </button>
+                    <button type="button" class="settings-link-button" id="clearStoredKeyBtn">
+                        Clear saved key
+                    </button>
+                </div>
+                <p class="api-key-feedback" id="apiKeyFeedback" aria-live="polite"></p>
+            </section>
+
+  
+          </div>
+    </div>
+
+    <!-- Mobile Tools Menu Modal -->
+    <div
+        class="mobile-tools-modal hidden"
+        id="mobileToolsModal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="mobileToolsTitle"
+        tabindex="-1"
+    >
+        <div class="mobile-tools-backdrop" id="mobileToolsBackdrop"></div>
+        <div class="mobile-tools-content" role="document">
+            <div class="mobile-tools-header">
+                <h2 id="mobileToolsTitle">Tools</h2>
+                <button type="button" class="mobile-tools-close" id="closeMobileToolsBtn" aria-label="Close tools menu">×</button>
+            </div>
+            <div class="mobile-tools-body">
+                <div class="mobile-tools-section">
+                    <h3>Session</h3>
+                    <div class="mobile-tools-grid">
+                        <button onclick="createNewSessionBtn(); closeMobileTools();">🆕 New Session</button>
+                        <button onclick="showSessionInfo(); closeMobileTools();">📋 Session Info</button>
+                    </div>
+                </div>
+                <div class="mobile-tools-section">
+                    <h3>Edit</h3>
+                    <div class="mobile-tools-grid">
+                        <button id="mobileUndoBtn" onclick="undoAction();">↩️ Undo</button>
+                        <button id="mobileRedoBtn" onclick="redoAction();">↪️ Redo</button>
+                        <button onclick="deleteSelectedImages();">🗑️ Delete</button>
+                        <button onclick="createTextNoteButton(); closeMobileTools();">📝 New Note</button>
+                    </div>
+                </div>
+                <div class="mobile-tools-section">
+                    <h3>View</h3>
+                    <div class="mobile-tools-grid">
+                        <button onclick="togglePanMode();">✋ Pan Mode</button>
+                        <button onclick="zoomIn();">🔍 Zoom In</button>
+                        <button onclick="zoomOut();">🔎 Zoom Out</button>
+                        <button onclick="resetCanvas();">🔄 Reset View</button>
+                    </div>
+                </div>
+                <div class="mobile-tools-section">
+                    <h3>Canvas</h3>
+                    <div class="mobile-tools-grid">
+                        <button onclick="clearCanvas(); closeMobileTools();">🧹 Clear All</button>
+                        <button onclick="exportCanvas(); closeMobileTools();">💾 Export JSON</button>
+                        <button onclick="openImportJsonDialog(); closeMobileTools();">📂 Import JSON</button>
+                        <button onclick="exportAllAssets(); closeMobileTools();">📦 Export Assets</button>
+                    </div>
+                </div>
+                <div class="mobile-tools-section">
+                    <h3>More</h3>
+                    <div class="mobile-tools-grid">
+                        <button onclick="document.getElementById('openTemplateModalBtn').click(); closeMobileTools();">🧩 Templates</button>
+                        <button onclick="document.getElementById('openOnboardingBtn').click(); closeMobileTools();">📖 Guide</button>
+                        <button onclick="document.getElementById('openSettingsBtn').click(); closeMobileTools();">⚙️ Settings</button>
+                        <button onclick="window.open('https://discord.gg/zUXMBdzV', '_blank');">💬 Discord</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/session.js"></script>
+    <script src="src/agent.js"></script>
+    <script src="src/state.js"></script>
+    <script src="src/storage.js"></script>
+    <script src="src/canvas.js"></script>
+    <script src="src/tools.js"></script>
+    <script src="src/chat.js"></script>
+    <script src="src/autocomplete.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>

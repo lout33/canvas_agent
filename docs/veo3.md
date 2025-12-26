@@ -1,0 +1,1 @@
+Well, remember we can also generate videos using the gem in API cards. So, it also should work when I request to generate a video, but yeah, check if this code is already with them to handle like imagineeration
