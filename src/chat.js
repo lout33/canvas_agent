@@ -494,13 +494,22 @@ function sendMessage() {
     }
 
     sendBtn.disabled = true;
-    sendBtn.textContent = 'Queuing...';
+    sendBtn.textContent = directModeEnabled ? 'Generating...' : 'Queuing...';
 
     try {
         addChatMessage(userMessage, 'user');
         chatInput.value = '';
         autoResizeTextarea(chatInput); // Reset textarea size after clearing
 
+        // Handle direct image generation mode
+        if (directModeEnabled) {
+            const templateApplication = applyTemplatesToMessage(userMessage);
+            const effectiveMessage = templateApplication.effectiveMessage;
+            handleDirectImageGeneration(effectiveMessage, apiKey);
+            return;
+        }
+
+        // Normal agent-based processing
         const templateApplication = applyTemplatesToMessage(userMessage);
         const effectiveMessage = templateApplication.effectiveMessage;
 
@@ -523,7 +532,7 @@ function sendMessage() {
         });
     } finally {
         sendBtn.disabled = false;
-        sendBtn.textContent = 'Send Message';
+        updateSendButtonText();
     }
 }
 
@@ -1719,6 +1728,79 @@ async function generateSingleImage(apiKey, requestId, prompt, index, total, sour
 }
 
 // ============================================================================
+// Direct Image Mode
+let directModeEnabled = false;
+const DIRECT_MODE_STORAGE_KEY = 'direct_image_mode';
+
+function initDirectMode() {
+    const directModeToggle = document.getElementById('directModeToggle');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    if (!directModeToggle || !sendBtn) return;
+    
+    // Load saved state
+    directModeEnabled = localStorage.getItem(DIRECT_MODE_STORAGE_KEY) === 'true';
+    directModeToggle.checked = directModeEnabled;
+    updateSendButtonText();
+    
+    // Handle toggle changes
+    directModeToggle.addEventListener('change', () => {
+        directModeEnabled = directModeToggle.checked;
+        localStorage.setItem(DIRECT_MODE_STORAGE_KEY, directModeEnabled.toString());
+        updateSendButtonText();
+    });
+}
+
+function updateSendButtonText() {
+    const sendBtn = document.getElementById('sendBtn');
+    const chatInput = document.getElementById('chatInput');
+    
+    if (sendBtn) {
+        sendBtn.textContent = directModeEnabled ? 'Generate Image' : 'Send Message';
+    }
+    
+    if (chatInput) {
+        chatInput.classList.toggle('direct-mode-active', directModeEnabled);
+        chatInput.placeholder = directModeEnabled 
+            ? 'Enter your image prompt... (Direct to image model)'
+            : 'Type your command... (e.g., \'generate 3 sunset images\')';
+    }
+}
+
+async function handleDirectImageGeneration(userMessage, apiKey) {
+    const requestId = ++requestSequence;
+    startRequestStatus(requestId, 'Queued');
+    
+    try {
+        updateRequestStatus(requestId, 'running', 'Generating image directly...');
+        addRequestLog(requestId, '🎨', 'Direct image generation mode');
+        
+        const placeholder = addImagePlaceholder(requestId, userMessage, '9:16');
+        
+        const generatedImage = await generateSingleImage(
+            apiKey,
+            requestId,
+            userMessage,
+            1,
+            1,
+            null,
+            '9:16',
+            [],
+            placeholder
+        );
+        
+        if (generatedImage) {
+            updateRequestStatus(requestId, 'complete', 'Image generated successfully');
+            addRequestLog(requestId, '✅', 'Direct image generation complete');
+        }
+    } catch (error) {
+        console.error('Direct image generation failed:', error);
+        updateRequestStatus(requestId, 'error', error.message || 'Direct image generation failed');
+        addRequestLog(requestId, '❌', `Direct generation failed: ${error.message}`);
+    }
+}
+
+// ============================================================================
 // Auto-resize textarea functionality
 function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
@@ -1796,6 +1878,18 @@ if (toggleApiKeyBtn && apiKeyInput) {
 }
 
 
+function getShortModelName(model) {
+    const nameMap = {
+        'gemini-2.5-flash': 'Gemini 2.5 Flash',
+        'gemini-2.5-pro': 'Gemini 2.5 Pro',
+        'gemini-3-pro-preview': 'Gemini 3 Pro',
+        'gemini-3-flash-preview': 'Gemini 3 Flash',
+        'gemini-2.5-flash-image': 'Gemini 2.5 Flash',
+        'gemini-3-pro-image-preview': 'Gemini 3 Pro'
+    };
+    return nameMap[model] || model;
+}
+
 function renderAgentModelOptions(selectEl) {
     if (!selectEl) {
         return;
@@ -1805,7 +1899,7 @@ function renderAgentModelOptions(selectEl) {
     supportedAgentModels.forEach((model) => {
         const option = document.createElement('option');
         option.value = model;
-        option.textContent = model;
+        option.textContent = getShortModelName(model);
         selectEl.appendChild(option);
     });
 }
@@ -1819,7 +1913,7 @@ function renderImageModelOptions(selectEl) {
     supportedImageModels.forEach((model) => {
         const option = document.createElement('option');
         option.value = model;
-        option.textContent = model;
+        option.textContent = getShortModelName(model);
         selectEl.appendChild(option);
     });
 }
@@ -3077,6 +3171,7 @@ function updateFreeUsageUI() {
 // Initialize usage UI on load
 document.addEventListener('DOMContentLoaded', () => {
     updateFreeUsageUI();
+    initDirectMode();
 });
 
 // Also update when API key changes
