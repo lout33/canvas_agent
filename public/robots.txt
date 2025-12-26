@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://image-creator-agent.vercel.app/sitemap.xml
+Sitemap: https://canvas-agent-zeta.vercel.app/sitemap.xml
