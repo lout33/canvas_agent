@@ -1360,7 +1360,7 @@ async function executeCommand({ command, requestId, apiKey, referencedImages, re
     }
 
     const VALID_ASPECT_RATIOS = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9'];
-    let aspectRatio = commandJson.aspectRatio || '9:16';
+    let aspectRatio = commandJson.aspectRatio || selectedAspectRatio;
 
     if (!VALID_ASPECT_RATIOS.includes(aspectRatio)) {
         addRequestLog(
@@ -1393,9 +1393,9 @@ async function executeCommand({ command, requestId, apiKey, referencedImages, re
     const PARALLEL_IMAGE_STAGGER_MS = 100;
 
     if (commandJson.useReferencedImages) {
-        let useAspectRatio = commandJson.aspectRatio || referencedImages[0]?.aspectRatio || '9:16';
+        let useAspectRatio = commandJson.aspectRatio || referencedImages[0]?.aspectRatio || selectedAspectRatio;
         if (!VALID_ASPECT_RATIOS.includes(useAspectRatio)) {
-            useAspectRatio = '9:16';
+            useAspectRatio = selectedAspectRatio;
         }
 
         const baseSources = referencedImages.map(img => ({
@@ -1730,17 +1730,23 @@ async function generateSingleImage(apiKey, requestId, prompt, index, total, sour
 // ============================================================================
 // Direct Image Mode
 let directModeEnabled = false;
+let selectedAspectRatio = '1:1';
 const DIRECT_MODE_STORAGE_KEY = 'direct_image_mode';
+const ASPECT_RATIO_STORAGE_KEY = 'direct_aspect_ratio';
 
 function initDirectMode() {
     const directModeToggle = document.getElementById('directModeToggle');
+    const aspectRatioSelect = document.getElementById('aspectRatioSelect');
     const sendBtn = document.getElementById('sendBtn');
     
-    if (!directModeToggle || !sendBtn) return;
+    if (!directModeToggle || !aspectRatioSelect || !sendBtn) return;
     
     // Load saved state
     directModeEnabled = localStorage.getItem(DIRECT_MODE_STORAGE_KEY) === 'true';
+    selectedAspectRatio = localStorage.getItem(ASPECT_RATIO_STORAGE_KEY) || '1:1';
+    
     directModeToggle.checked = directModeEnabled;
+    aspectRatioSelect.value = selectedAspectRatio;
     updateSendButtonText();
     
     // Handle toggle changes
@@ -1748,6 +1754,12 @@ function initDirectMode() {
         directModeEnabled = directModeToggle.checked;
         localStorage.setItem(DIRECT_MODE_STORAGE_KEY, directModeEnabled.toString());
         updateSendButtonText();
+    });
+    
+    // Handle aspect ratio changes
+    aspectRatioSelect.addEventListener('change', () => {
+        selectedAspectRatio = aspectRatioSelect.value;
+        localStorage.setItem(ASPECT_RATIO_STORAGE_KEY, selectedAspectRatio);
     });
 }
 
@@ -1772,19 +1784,41 @@ async function handleDirectImageGeneration(userMessage, apiKey) {
     startRequestStatus(requestId, 'Queued');
     
     try {
-        updateRequestStatus(requestId, 'running', 'Generating image directly...');
-        addRequestLog(requestId, '🎨', 'Direct image generation mode');
+        updateRequestStatus(requestId, 'running', 'Processing direct image generation...');
         
-        const placeholder = addImagePlaceholder(requestId, userMessage, '9:16');
+        // Extract note references from the message
+        const noteIdsInMessage = extractPrefixedIds(userMessage, NOTE_REFERENCE_REGEX);
+        let enhancedPrompt = userMessage;
+        
+        if (noteIdsInMessage.length > 0) {
+            const referencedNotes = canvasState.notes.filter(note => noteIdsInMessage.includes(note.id));
+            
+            if (referencedNotes.length > 0) {
+                addRequestLog(requestId, '📝', `Including content from ${referencedNotes.length} note(s): ${referencedNotes.map(note => formatNoteRef(note.id)).join(', ')}`);
+                
+                // Append note content to the prompt
+                const noteContents = referencedNotes.map(note => note.text).join('\n\n');
+                enhancedPrompt = `${userMessage}\n\nNote Content:\n${noteContents}`;
+            }
+            
+            const missingNotes = noteIdsInMessage.filter(id => !referencedNotes.some(note => note.id === id));
+            if (missingNotes.length > 0) {
+                addRequestLog(requestId, '⚠️', `Note(s) not found: ${missingNotes.map(id => formatNoteRef(id)).join(', ')}`);
+            }
+        }
+        
+        addRequestLog(requestId, '🎨', `Direct image generation (${selectedAspectRatio})`);
+        
+        const placeholder = addImagePlaceholder(requestId, enhancedPrompt, selectedAspectRatio);
         
         const generatedImage = await generateSingleImage(
             apiKey,
             requestId,
-            userMessage,
+            enhancedPrompt,
             1,
             1,
             null,
-            '9:16',
+            selectedAspectRatio,
             [],
             placeholder
         );

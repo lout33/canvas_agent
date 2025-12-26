@@ -909,6 +909,18 @@ Chat panel
 .model-selector-group.direct-mode-group {
     flex: 0 0 auto;
     min-width: auto;
+    gap: var(--space-1);
+}
+
+.aspect-ratio-select {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    min-width: 50px;
+    flex: 1;
 }
 
 .chat-model-select {
